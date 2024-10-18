@@ -1,0 +1,12 @@
+[2024-03-28 10:25:12] SMTP Error: Could not authenticate.
+[2024-03-28 10:27:41] SMTP Error: Could not authenticate.
+[2024-03-28 10:28:32] PHPMailer\PHPMailer\Exception: SMTP Error: Could not authenticate. in C:\xampp\htdocs\FileTrackingSystem\assets\PHPMailer\src\PHPMailer.php:2265
+Stack trace:
+#0 C:\xampp\htdocs\FileTrackingSystem\assets\PHPMailer\src\PHPMailer.php(2062): PHPMailer\PHPMailer\PHPMailer->smtpConnect(Array)
+#1 C:\xampp\htdocs\FileTrackingSystem\assets\PHPMailer\src\PHPMailer.php(1689): PHPMailer\PHPMailer\PHPMailer->smtpSend('Date: Thu, 28 M...', 'FTS - KNIT | Yo...')
+#2 C:\xampp\htdocs\FileTrackingSystem\assets\PHPMailer\src\PHPMailer.php(1523): PHPMailer\PHPMailer\PHPMailer->postSend()
+#3 C:\xampp\htdocs\FileTrackingSystem\mailer.php(70): PHPMailer\PHPMailer\PHPMailer->send()
+#4 C:\xampp\htdocs\FileTrackingSystem\mailer.php(111): MailerAction->send_otp()
+#5 {main}
+[2024-03-28 17:15:05] shivamray07022002@gmail.com
+[2024-03-28 17:15:32] shivamray07022002@gmail.com112736

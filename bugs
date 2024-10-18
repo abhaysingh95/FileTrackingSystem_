@@ -1,0 +1,6 @@
+1. fix same department/user in dropdowns of send files
+2. required field on textarea of recievers' notes in not working
+3. only most recent transaction is considered when deciding which file is related to a user (need to verify)
+4. select on side-panel is not working for track all files in admin panel
+5. change password page not opening from top bar
+6. danger_alerts are stacking on each other (display only the latest one)

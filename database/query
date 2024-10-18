@@ -1,0 +1,115 @@
+departments(id,name,contact,email,active),
+users(id,firstname,lastname,email,password,type,dept_id,date_created,active),
+files(id,file_name,creator_id,file_desc,date_created,active),
+transactions(reference_number,sender_id,recipient_id,file_id,sender_notes,reciever_notes,status,date_created)
+
+
+1 = sent 
+2 = accepted
+3 = refused
+4 = returned
+5 = forwarded (a new reference_number is generated and a new entry is created in transactions)
+
+
+ 
+                >  query for displaying list of files for admin
+                            SELECT 
+								f.id as file_id,
+								f.file_name as file_name,
+								CONCAT(u.firstname, ' ', u.lastname , ' ,' , d.name) AS creator_name,
+								COALESCE( 	CONCAT(sender.firstname,' ',sender.lastname,' [',LEFT(sender_dept.name,3),']',
+											'-->',
+											recipient.firstname,' ',recipient.lastname,' [',LEFT(recipient_dept.name,3),']') ,
+											CONCAT(u.firstname,' ',u.lastname) 
+										) AS current_loc,
+								COALESCE(t.status, 0) AS current_status
+							FROM 
+								files as f
+							LEFT JOIN 
+								users as u ON f.creator_id = u.id
+							LEFT JOIN
+								departments as d ON u.dept_id = d.id
+							LEFT JOIN 
+								(
+        							SELECT 
+										*
+									FROM 
+										transactions
+									WHERE 
+										(file_id, date_created) IN (
+											SELECT 
+												file_id,
+												MAX(date_created) AS max_date_created
+											FROM 
+												transactions
+											GROUP BY 
+												file_id
+										)
+								) AS t ON t.file_id = f.id
+							LEFT JOIN 
+								users AS sender ON t.sender_id = sender.id
+							LEFT JOIN 
+    							departments AS sender_dept ON sender.dept_id = sender_dept.id
+							LEFT JOIN 
+								users AS recipient ON t.recipient_id = recipient.id
+							LEFT JOIN 
+    							departments AS recipient_dept ON recipient.dept_id = recipient_dept.id
+							ORDER BY  unix_timestamp(t.date_created) DESC
+
+				>query for files related to a given user (departmental)
+							SELECT DISTINCT f.id AS file_id
+							FROM files AS f
+							LEFT JOIN users AS u ON f.creator_id = u.id
+							LEFT JOIN transactions AS t ON f.id = t.file_id
+							WHERE 
+								u.dept_id = (
+									SELECT dept_id
+									FROM users
+									WHERE id = "2020acd1058"
+								)
+								OR t.sender_id IN (
+									SELECT id
+									FROM users
+									WHERE dept_id = (
+										SELECT dept_id
+										FROM users
+										WHERE id = "2020acd1058"
+									)
+								)
+								OR t.recipient_id IN (
+									SELECT id
+									FROM users
+									WHERE dept_id = (
+										SELECT dept_id
+										FROM users
+										WHERE id = "2020acd1058"
+									)
+								)
+								OR EXISTS (
+									SELECT 1
+									FROM transactions AS t2
+									WHERE t2.file_id = f.id
+									AND t2.status = 5
+									AND (
+										t2.sender_id IN (
+											SELECT id
+											FROM users
+											WHERE dept_id = (
+												SELECT dept_id
+												FROM users
+												WHERE id = "2020acd1058"
+											)
+										)
+										OR t2.recipient_id IN (
+											SELECT id
+											FROM users
+											WHERE dept_id = (
+												SELECT dept_id
+												FROM users
+												WHERE id = "2020acd1058"
+											)
+										)
+									)
+								)
+								AND f.active = 1;
+
